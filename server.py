@@ -1,16 +1,17 @@
+"""
+server.py
+Contains the main flask server code for handling requests
+@author Daniel Roberts
+"""
+
 from flask import *
 from song import Song
-import requests, json, random
+import speaker_communication, json, random
 
 app = Flask(__name__)
 
 # global data structure for storing requests
 suggestions = []
-
-
-# TODO: implement this later
-def send_request_to_speaker(url):
-    return url
 
 
 def make_json(**kwargs):
