@@ -5,17 +5,12 @@ Contains the main flask server code for handling requests
 """
 
 from flask import *
-from song import Song
-import speaker_communication, json, random
+from song import Suggestions
 
 app = Flask(__name__)
 
 # global data structure for storing requests
-suggestions = []
-
-
-def make_json(**kwargs):
-    return json.dumps(dict(kwargs.items()))
+suggestions = Suggestions()
 
 
 @app.route('/')
@@ -29,28 +24,10 @@ def suggest():
     song_name = request.args.get('name')
     artist = request.args.get('artist')
     url = request.args.get('url')
-    request_id = random.getrandbits(128)
-    try:
-        new_suggestion = Song(song_name, artist, url, request_id)
-        suggestions.append(new_suggestion)
-        return make_json(status="success",
-                         song_name=song_name,
-                         artist=artist,
-                         url=url,
-                         request_id=request_id)
-    except Exception as ex:
-        return make_json(error='An exception occurred in parsing the suggested song URL',
-                         exception=ex.__str__(),
-                         song_name=song_name,
-                         artist=artist,
-                         url=url,
-                         request_id=request_id)
+    return suggestions.add_suggestion(song_name, artist, url)
 
 
 @app.route('/queue', methods=['GET'])
 def get_queue():
-    # format the queue in a user friendly way
-    song_list = []
-    for item in suggestions:
-        song_list.append(item.get_song())
-    return make_json(queue=song_list)
+    global suggestions
+    return suggestions.get_suggestions()
