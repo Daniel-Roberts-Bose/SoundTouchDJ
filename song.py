@@ -8,9 +8,20 @@ from collections import deque
 import util
 
 
-class Suggestions:
+class Suggestions(object):
+    __instance = None
+
+    # static singleton creation method
+    @classmethod
+    def instance(cls):
+        if cls.__instance is None:
+            print("Creating new Suggestions instance")
+            cls.__instance = cls.__new__(cls)
+            cls.suggestions = deque([])  # an array of Song objects
+        return cls.__instance
+
     def __init__(self):
-        self.suggestions = deque([])  # an array of Song objects
+        raise RuntimeError("Call instance() instead")
 
     # logic for adding a suggestion to the array
     def add_suggestion(self, song_name, artist, url):

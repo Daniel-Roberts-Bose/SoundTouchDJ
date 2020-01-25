@@ -9,8 +9,8 @@ from song import Suggestions
 
 app = Flask(__name__)
 
-# global data structure for storing requests
-suggestions = Suggestions()
+# global data structure for storing requests, this is a singleton
+suggestions = Suggestions.instance()
 
 
 @app.route('/')
