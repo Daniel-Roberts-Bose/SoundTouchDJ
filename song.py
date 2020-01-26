@@ -6,9 +6,15 @@ contains a class definition for the song data type
 from youtube_parser import YoutubeParser
 from collections import deque
 import util
+from threading import Lock
 
 
 class Suggestions(object):
+    """
+    Suggestions class requires thread safety due to being accessed from the main UI thread
+    as well as the speaker polling thread. This class will handle its own thread
+    safety via an internal locking mechanism
+    """
     __instance = None
 
     # static singleton creation method
@@ -18,6 +24,7 @@ class Suggestions(object):
             print("Creating new Suggestions instance")
             cls.__instance = cls.__new__(cls)
             cls.suggestions = deque([])  # an array of Song objects
+            cls.suggestions_lock = Lock()  # A mutex for ensuring thread safety, must be called via atomic utility func
         return cls.__instance
 
     def __init__(self):

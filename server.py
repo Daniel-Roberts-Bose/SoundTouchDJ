@@ -24,6 +24,7 @@ def suggest():
     song_name = request.args.get('name')
     artist = request.args.get('artist')
     url = request.args.get('url')
+    # TODO: Need to add some thread safety here
     return suggestions.add_suggestion(song_name, artist, url)
 
 

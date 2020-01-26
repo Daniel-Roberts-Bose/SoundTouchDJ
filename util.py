@@ -14,3 +14,29 @@ def make_json(**kwargs):
 
 def make_random_request_id():
     return random.getrandbits(128)
+
+
+def perform_atomic_operation(lock, func, *argv):
+    """
+    Perform a thread safe operation on the given function
+    :param lock: the mutex the lock
+    :param func: the function object to call
+    :param argv: the arguments, if any, to pass to the function
+    """
+    lock.acquire()
+    func(*argv)
+    lock.release()
+
+
+def perform_atomic_get(lock, func, *argv):
+    """
+    Perform a thread safe get on a given function
+    :param lock: the mutex the lock
+    :param func: the function object to call
+    :param argv: the arguments, if any, to pass to the function
+    :return:
+    """
+    lock.acquire()
+    var = func(*argv)
+    lock.release()
+    return var
