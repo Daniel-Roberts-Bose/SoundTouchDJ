@@ -37,11 +37,23 @@ class Speaker:
 
     def poll_speaker(self, interval):
         print("Polling loop BEGIN. Interval = %f" % interval)
-        while util.perform_atomic_get(self.running_lock, self.get_is_running):
+        error_count = 0
+        while util.perform_atomic_get(self.running_lock, self.get_is_running) and error_count < 10:
             # send a request to the speaker to see if we are currently playing,
-            # if we are not, pop something from the queue and play it
-            song = util.perform_atomic_get(suggestions.suggestions_lock, suggestions.pop_suggestion)
-            print(song)
+            address = self.ip_address + self.get_now_playing_endpoint
+            resp = requests.get(address)
+
+            play_status = util.get_now_playing_play_status(resp)
+            if play_status is None:
+                error_count += 1
+            else:
+                # If we get a good response, check if we are playing or stopped
+
+                # If we are not playing, start a new song, if we have something in the queue
+                song = util.perform_atomic_get(suggestions.suggestions_lock, suggestions.pop_suggestion)
+                if song is not None:
+                    pass
+
             sleep(interval)
 
     # must be called from a thread safe manner, using a lock

@@ -5,6 +5,7 @@ Contains utility functions for use in the application
 """
 import json
 import random
+import xml.etree.ElementTree as ET
 
 
 # helper function for creating json information
@@ -40,3 +41,26 @@ def perform_atomic_get(lock, func, *argv):
     var = func(*argv)
     lock.release()
     return var
+
+
+# generic helper function to help parse the now playing xml into a python object
+def parse_now_playing(resp):
+    # parse the xml formatted response
+    tree = ET.parse(resp.content)
+    root = tree.getroot()
+    if root.tag != 'nowPlaying':
+        # some error occurred in speaker communication, increment error count
+        print("Could not get nowPlaying information")
+        print(resp.content)
+        return None
+    else:
+        return tree
+
+
+# returns the play status object from within a now playing response, if possible
+def get_now_playing_play_status(resp):
+    tree = parse_now_playing(resp)
+    if tree is None:
+        return None
+
+    return tree.findall('playStatus')
